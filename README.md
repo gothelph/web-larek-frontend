@@ -129,7 +129,9 @@ yarn build
 - `OrderInfoFormView`: шаг 1 — адрес и способ оплаты.
 - `OrderInfoContactsFormView`: шаг 2 — email и телефон.
 - Оба наследуются от абстрактного класса `Form<T>`:
-  - Поля: `errors`, `submit`.
+  - Поля:
+  - `errors`: элемент с выводом ошибки формы.
+  - `submit`: кнопка отправки формы.
   - Методы: `render()`, `onInputChange()`.
 
 ### **Модальное окно:**
