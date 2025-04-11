@@ -18,6 +18,8 @@ npm run build
 yarn build
 ```
 
+---
+
 # Архитектура проекта
 
 ## **1. Описание данных: интерфейсы и классы с хранением данных**
@@ -28,25 +30,34 @@ yarn build
 
 - **Товары**
 
-  - `ProductItem`: представляет товар (id, title, image, description, category, price).
+  - `IProductItem`: представляет товар (id, title, image, description, category, price).
 
 - **Корзина**
 
-  - `BasketItem`: элемент корзины (id, title, price).
-  - `BasketModel`: интерфейс корзины — методы для управления и коллекция `items`.
+  - `IBasketItem`: элемент корзины (id, title, price).
+  - `IBasketModel`: интерфейс корзины — методы для управления и коллекция `items`.
 
 - **Заказ**
 
-  - `OrderInfo`: итоговые данные заказа — адрес, email, телефон, способ оплаты, список товаров, общая сумма.
+  - `IOrderInfo`: итоговые данные заказа — адрес, email, телефон, способ оплаты, список товаров, общая сумма.
 
 - **API**
 
-  - `ClientApi`: интерфейс клиентской части API для работы с товарами и заказами.
-  - `ApiError`: структура ошибки от API.
+  - `IClientApi`: интерфейс клиентской части API для работы с товарами и заказами.
+  - `IApiError`: структура ошибки от API.
 
 - **Валидация**
-  - `ValidatorSettings`: параметры валидации формы.
-  - `Validator`: интерфейс валидатора с методами `enableValidation()` и `clearValidation()`.
+
+  - `IValidatorSettings`: параметры валидации формы.
+  - `IValidator`: интерфейс валидатора с методами `enableValidation()` и `clearValidation()`.
+
+- **Типы карточек**
+
+  - `CardViewType`: определяет тип визуального отображения карточки: `'catalog'`, `'preview'`, `'basket'`.
+
+  - `CardItemType<T>`: определяет тип содержимого карточки в зависимости от её вида (`IProductItem` или `IBasketItem`).
+
+  - `CardViewFactoryType<T>`: функция, генерирующая DOM-элемент карточки по шаблону и типу.
 
 ---
 
@@ -54,17 +65,17 @@ yarn build
 
 ### **Классы:**
 
-- **Basket (реализация `BasketModel`)**
+- **Basket (реализация `IBasketModel`)**
 
-  - Хранит товары в `Map<string, BasketItem>`.
+  - Хранит товары в `Map<string, IBasketItem>`.
   - Методы:
-    - `addItem(item: BasketItem)`: добавляет товар в корзину.
+    - `addItem(item: IBasketItem)`: добавляет товар в корзину.
     - `removeItem(id: string)`: удаляет товар из корзины.
     - `clear()`: очищает корзину.
     - `getTotalPrice()`: рассчитывает сумму заказа.
   - Назначение: управляет состоянием корзины и предоставляет методы для её изменения.
 
-- **ApiService (реализация `ClientApi`)**
+- **ApiService (реализация `IClientApi`)**
 
   - Методы:
     - `getProductList()`: получает список товаров.
@@ -72,12 +83,22 @@ yarn build
     - `processOrder(order)`: отправляет заказ.
   - Назначение: абстрагирует взаимодействие с сервером.
 
-- **FormValidator (реализация `Validator`)**
-  - Использует `ValidatorSettings`.
+- **FormValidator (реализация `IValidator`)**
+
+  - Использует `IValidatorSettings`.
   - Методы:
     - `enableValidation()`: навешивает слушатели событий.
     - `clearValidation(form)`: сбрасывает валидацию.
   - Назначение: управляет валидацией форм.
+
+- **CardView <T extends CardViewType> (абстрактный класс)**
+
+  - Универсальный класс отображения карточки.
+  - Поля:
+    - `element`: HTML-элемент карточки.
+    - `prepareTemplate`: функция генерации шаблона (фабрика).
+  - Конструктор принимает: шаблон, тип карточки, товар или элемент корзины, обработчик клика и события.
+  - Используется для создания всех типов карточек.
 
 ---
 
@@ -85,27 +106,41 @@ yarn build
 
 ### **Карточки и списки товаров:**
 
-- `ProductView`: карточка товара с обработчиком клика (`onClick(id)`).
-- `DetailProductView`: детальный просмотр товара с кнопкой "в корзину".
-- `ProductListView`: список карточек товаров.
+- Все карточки наследуются от базового `CardView`:
+  - `ProductView`: карточка товара в каталоге.
+  - `DetailProductView`: подробная карточка товара.
+  - `BasketItemView`: карточка элемента корзины.
+
+> `CardView` автоматически связывает шаблон, тип карточки и данные, и возвращает готовый `HTMLElement`.
+
+- `IMainPageView`: интерфейс главной страницы:
+  - `productList`: список карточек.
+  - `gallery`: блок с товарами.
+  - `headerBasketButton`, `headerBasketCounter`: элементы шапки.
+  - Методы: `renderProductList`, `fetchProductList`.
 
 ### **Корзина:**
 
-- `BasketItemView`: визуальное представление элемента корзины с `onRemove(id)`.
-- `BasketView`: интерфейс отображения всей корзины и кнопки подтверждения (`onConfirm()`).
+- `IBasketItemView`: визуальное представление элемента корзины.
+- `IBasketView`: интерфейс всей корзины с методами из `IBasketModel` + `onConfirm()` (подтверждение заказа).
 
 ### **Формы заказа:**
 
-- `OrderInfoFormView`: форма адреса и способа оплаты (шаг 1).
-- `OrderInfoContactsFormView`: форма email и телефона (шаг 2).
+- `OrderInfoFormView`: шаг 1 — адрес и способ оплаты.
+- `OrderInfoContactsFormView`: шаг 2 — email и телефон.
+- Оба наследуются от абстрактного класса `Form<T>`:
+  - Поля: `errors`, `submit`.
+  - Методы: `render()`, `onInputChange()`.
 
 ### **Модальное окно:**
 
-- `ModalView`: управление открытием/закрытием модальных окон.
+- `ModalView`: базовый класс модального окна.
+  - Методы: `openModal()`, `closeModal()`, `render()`.
+  - Поля: `element`, `closeButton`.
 
 ### **Финальный экран:**
 
-- `SuccessView`: отображает итоговую сумму после успешного оформления заказа.
+- `ISuccessView`: объект с итоговой суммой после успешного оформления заказа (`total`).
 
 ---
 
@@ -122,13 +157,12 @@ yarn build
 
 ### **События – действия пользователя (UI события):**
 
-- Клик по карточке товара (`ProductView.onClick`) → переход в детальный просмотр.
-- Клик по кнопке "Добавить в корзину" (`DetailProductView.onAddToBasket`) → вызывает `BasketModel.addItem`.
-- Клик по "Удалить" в корзине (`BasketItemView.onRemove`) → вызывает `BasketModel.removeItem`.
-- Клик по "Оформить заказ" в корзине → запускает цепочку `OrderInfoFormView → OrderInfoContactsFormView → processOrder`.
-- Клик по "Назад"/"Отмена" в формах заказа → возвращает к предыдущему шагу или закрывает модалку.
-- Инпуты форм → триггерят валидацию (`FormValidator.isValid`).
-- Клик по кнопке "Подтвердить" → отправка формы, переход к `SuccessView`.
+- Клик по карточке товара (`ProductView.onClick`) → переход в подробный просмотр.
+- Клик по "Добавить в корзину" (`DetailProductView`) → вызывает `IBasketModel.addItem`.
+- Клик по "Удалить" в корзине (`BasketItemView`) → вызывает `IBasketModel.removeItem`.
+- Клик по "Оформить заказ" → запускает цепочку `OrderInfoFormView → OrderInfoContactsFormView → processOrder`.
+- Ввод данных в форме → вызывает `Form.onInputChange()` и запускает валидацию.
+- Клик по кнопке подтверждения заказа → отправка данных и отображение `SuccessView`.
 
 ---
 
