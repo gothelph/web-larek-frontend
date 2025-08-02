@@ -1,24 +1,34 @@
+import { getProducts } from './components/api';
+import { EventEmitter } from './components/base/events';
+import { createProductCard } from './components/productCard';
 import './scss/styles.scss';
+import { IProductItem } from './types';
 
-//Будущая реализация корзины
-// class Basket implements BasketModel {
-//     items: Map<string, BasketItem> = new Map();
+// const cardCatalogTemplate = document.getElementById(
+// 	'card-catalog'
+// ) as HTMLTemplateElement;
+// const cardPreviewTemplate = document.getElementById(
+// 	'card-preview'
+// ) as HTMLTemplateElement;
+// const cardBasketTemplate = document.getElementById(
+// 	'card-basket'
+// ) as HTMLTemplateElement;
+// const basketTemplate = document.getElementById('basket') as HTMLTemplateElement;
+// const orderTemplate = document.getElementById('order') as HTMLTemplateElement;
+// const contactsTemplate = document.getElementById(
+// 	'contacts'
+// ) as HTMLTemplateElement;
 
-//     getTotalPrice() {
-//         let total = 0
-//         this.items.forEach(item => total += item.price)
-//         return total
-//     }
+const eventEmitter = new EventEmitter();
 
-//     addItem(item: BasketItem) {
-//         this.items.set(item.id, item)
-//     }
+function renderGallery(products: IProductItem[]) {
+	const gallery = document.querySelector('.gallery');
 
-//     removeItem(id: string) {
-//         this.items.delete(id)
-//     }
+	products.forEach((product) => {
+		const productCard = createProductCard(product, eventEmitter);
 
-//     clear() {
-//         this.items.clear()
-//     }
-// }
+		gallery.appendChild(productCard);
+	});
+}
+
+getProducts().then((products) => renderGallery(products));

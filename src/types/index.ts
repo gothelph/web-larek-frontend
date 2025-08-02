@@ -58,7 +58,7 @@ type CardViewFactoryType<T extends CardViewType> = ({
 	onClick,
 }: {
 	type: T;
-	template: HTMLTemplateElement;
+	template: string;
 	item: CardItemType<T>;
 	onClick: (id: string) => void;
 }) => HTMLElement;
@@ -77,13 +77,13 @@ abstract class CardView<T extends CardViewType> {
 		events,
 	}: {
 		type: T;
-		template: HTMLTemplateElement;
+		template: string;
 		item: CardItemType<T>;
 		onClick: (id: string) => void;
 		events: IEvents;
 	}) {}
 
-	private prepareTemplate: CardViewFactoryType<T>;
+	prepareTemplate: CardViewFactoryType<T>;
 	element: HTMLElement;
 }
 
@@ -115,9 +115,9 @@ export abstract class ModalView {
 	constructor(container: HTMLElement, events: IEvents) {}
 	element: HTMLElement;
 	closeButton: HTMLButtonElement;
-	openModal: (modal: HTMLDivElement) => void;
-	closeModal: (modal: HTMLDivElement) => void;
-	render: () => void;
+	abstract openModal(modal: HTMLDivElement): void;
+	abstract closeModal(modal: HTMLDivElement): void;
+	// abstract render(): void;
 }
 
 abstract class Form<T> {
@@ -154,3 +154,7 @@ export interface IValidator {
 	enableValidation: () => void;
 	clearValidation: (form: HTMLFormElement) => void;
 }
+
+//Отображение
+
+//рендер главной страницы
