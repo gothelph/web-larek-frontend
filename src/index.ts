@@ -11,12 +11,11 @@ const basket = new Basket(eventEmitter);
 new BasketView(eventEmitter, basket);
 
 function renderGallery(products: IProductItem[]) {
-  const gallery = document.querySelector('.gallery');
-  products.forEach((product) => {
-    const productCard = createProductCard(product, eventEmitter);
-    gallery.appendChild(productCard);
-  });
+	const gallery = document.querySelector('.gallery');
+	products.forEach((product) => {
+		const productCard = createProductCard(product, eventEmitter);
+		gallery.appendChild(productCard);
+	});
 }
 
 clientApi.getProductList().then((products) => renderGallery(products));
-
