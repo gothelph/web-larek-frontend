@@ -1,3 +1,5 @@
+import { IEvents } from "./events";
+
 export class Component<T> {
 	protected container: HTMLElement;
 
@@ -9,7 +11,7 @@ export class Component<T> {
 		this.container.classList.toggle(className);
 	}
 
-	public get element(): HTMLElement {
+	get element(): HTMLElement {
 		return this.container;
 	}
 
@@ -32,4 +34,10 @@ export class Component<T> {
 		Object.assign(this as object, data ?? {});
 		return this.container;
 	}
+}
+
+export class View<T> extends Component<T> {
+  constructor(protected readonly events: IEvents, container: HTMLElement) {
+    super(container);
+  }
 }

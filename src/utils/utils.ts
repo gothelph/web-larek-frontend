@@ -133,3 +133,11 @@ export function createElement<
     }
     return element;
 }
+
+export function validateEmail(email: string) {
+	return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
+export function validatePhone(phone: string) {
+	return /^\+7\s?\(\d{3}\)\s?\d{3}-\d{2}-\d{2}$/.test(phone);
+}
