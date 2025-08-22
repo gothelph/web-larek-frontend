@@ -53,17 +53,16 @@ eventEmitter.on(eventNames.contacts.submit, () => {
 	api
 		.processOrder(appState.order)
 		.then((result) => {
+			appState.clearBasket();
 			const successActions = {
 				onClick: () => {
 					modal.closeModal();
-					appState.clearBasket();
 				},
 			};
 			const success = new Success(
 				cloneTemplate(successTemplate),
 				successActions
 			);
-
 			modal.render({
 				content: success.render(result),
 			});
@@ -135,11 +134,12 @@ eventEmitter.on(eventNames.basket.open, () => {
 eventEmitter.on(eventNames.basket.change, () => {
 	page.counter = appState.basket.size;
 
-	basket.items = Array.from(appState.basket.values()).map(({ id }) => {
+	basket.items = Array.from(appState.basket.values()).map(({ id }, index) => {
 		const item = appState.products.find((el) => el.id === id);
 		const card = new Card(cloneTemplate(cardBasketTemplate), {
 			onClick: () => appState.removeFromBasket(id),
 		});
+		card.index = index + 1; // Добавляем нумерацию
 		return card.render(item);
 	});
 
@@ -201,43 +201,3 @@ api
 		appState.setProducts(products);
 	})
 	.catch((error) => console.error(error));
-
-//
-eventEmitter.on(eventNames.basket.change, () => {
-	page.counter = appState.basket.size;
-
-	basket.items = Array.from(appState.basket.values()).map(({ id }, index) => {
-		const item = appState.products.find((el) => el.id === id);
-		const card = new Card(cloneTemplate(cardBasketTemplate), {
-			onClick: () => appState.removeFromBasket(id),
-		});
-		card.index = index + 1; // Добавляем нумерацию
-		return card.render(item);
-	});
-
-	basket.total = appState.getBasketTotal();
-});
-
-eventEmitter.on(eventNames.contacts.submit, () => {
-	api
-		.processOrder(appState.order)
-		.then((result) => {
-			appState.clearBasket();
-			const successActions = {
-				onClick: () => {
-					modal.closeModal();
-				},
-			};
-			const success = new Success(
-				cloneTemplate(successTemplate),
-				successActions
-			);
-			modal.render({
-				content: success.render(result),
-			});
-			appState.clearOrder();
-		})
-		.catch((error) => {
-			console.error(error);
-		});
-});

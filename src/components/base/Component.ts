@@ -1,4 +1,4 @@
-import { IEvents } from "./events";
+import { IEvents } from './events';
 
 export class Component<T> {
 	protected container: HTMLElement;
@@ -37,7 +37,7 @@ export class Component<T> {
 }
 
 export class View<T> extends Component<T> {
-  constructor(protected readonly events: IEvents, container: HTMLElement) {
-    super(container);
-  }
+	constructor(protected readonly events: IEvents, container: HTMLElement) {
+		super(container);
+	}
 }
