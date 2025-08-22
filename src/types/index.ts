@@ -23,7 +23,7 @@ export interface IBasketItem {
 
 export interface IBasketModel {
 	items: Map<string, IBasketItem>;
-  total: number;
+	total: number;
 }
 
 export interface IOrderInfo {
@@ -53,40 +53,40 @@ export interface IClientApi {
 export type CardViewType = 'catalog' | 'preview' | 'basket';
 
 export interface IMainPageView {
-  catalog: HTMLElement[];
-  counter: number;
-  locked: boolean;
+	catalog: HTMLElement[];
+	counter: number;
+	locked: boolean;
 }
 
 export const eventNames = {
-  'preview': {
-    'change': 'preview:change',
-  },
-  'basket':  {
-    'open': 'basket:open',
-    'change': 'basket:change',
-  },
-  'card': {
-    'select': 'card:select',
-  },
-  'formErrors': {
-    'change': 'formErrors:change',
-  },
-  'order': {
-    'change': 'order:change',
-    'submit': 'order:submit',
-    'ready': 'order:ready',
-    'open': 'order:open',
-  },
-  'contacts': {
-    'submit': 'contacts:submit',
-    'change': 'contacts:change',
-  },
-  'product': {
-    'change': 'product:change',
-  },
-  'modal': {
-    'open': 'modal:open',
-    'close': 'modal:close',
-  },
-}
+	preview: {
+		change: 'preview:change',
+	},
+	basket: {
+		open: 'basket:open',
+		change: 'basket:change',
+	},
+	card: {
+		select: 'card:select',
+	},
+	formErrors: {
+		change: 'formErrors:change',
+	},
+	order: {
+		change: 'order:change',
+		submit: 'order:submit',
+		ready: 'order:ready',
+		open: 'order:open',
+	},
+	contacts: {
+		submit: 'contacts:submit',
+		change: 'contacts:change',
+	},
+	product: {
+		change: 'product:change',
+	},
+	modal: {
+		open: 'modal:open',
+		close: 'modal:close',
+	},
+};
